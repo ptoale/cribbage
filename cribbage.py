@@ -13,26 +13,27 @@ def score_hand(hand, starter):
     """
     points = 0
 
-    print "Checking for 15s..."
+#    print "Checking for 15s..."
     points += score_15(hand, starter)
-    print "  Points = %d" % points
+#    print "  Points = %d" % points
 
-    print "Checking for pairs..."
+#    print "Checking for pairs..."
     points += score_pairs(hand, starter)
-    print "  Points = %d" % points
+#    print "  Points = %d" % points
 
-    print "Checking for runs..."
+#    print "Checking for runs..."
     points += score_runs(hand, starter)
-    print "  Points = %d" % points
+#    print "  Points = %d" % points
 
-    print "Checking for flush..."
+#    print "Checking for flush..."
     points += score_flush(hand, starter)
-    print "  Points = %d" % points
+#    print "  Points = %d" % points
 
-    print "Checking for right jack..."
+#    print "Checking for right jack..."
     points += score_nibs(hand, starter)
-    print "  Points = %d" % points
+#    print "  Points = %d" % points
 
+    return points
 
 def score_15(hand, starter):
     """
@@ -272,15 +273,30 @@ if __name__ == '__main__':
 
 #   Play around
     deck = Deck()
-    deck.shuffle()
-    hand = []
-    for i in range(4):
-        hand.append(deck.deal.next())
-    starter = deck.deal.next()
+    n_hands = 1000000
 
-    print 'Hand: ',
-    for c in hand:
-        print c,
-    print '[', starter, ']'
+    total = 0
+    mx = -1
+    for h in range(n_hands):
+        deck.shuffle()
 
-    score_hand(hand, starter)
+        hand = []
+        for i in range(4):
+            hand.append(deck.deal.next())
+        starter = deck.deal.next()
+
+
+        pts = score_hand(hand, starter)
+        if pts > mx:
+            mx = pts
+
+            print 'Hand', h, ':',
+            for c in hand:
+                print c,
+            print '[', starter, ']',
+            print ':', pts, 'points'
+
+        total += pts
+
+    avg = float(total)/n_hands
+    print "Avg = %f   Max = %d" % (avg, mx)

@@ -355,6 +355,7 @@ class Deck(object):
         """
 
         self.rng.shuffle(self.cards)
+        self.deal = self.cards.__iter__()
 
     def __iter__(self):
         """
