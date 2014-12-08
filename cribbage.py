@@ -1,39 +1,53 @@
 #!/usr/bin/env python
-import math
+"""
+A module containing a collection of methods for scoring a cribbage hand.
+
+"""
 import itertools
 
-from card import Suit, Rank, Card, Deck
+from card import Suit, Rank, Deck
 
 
-def score_hand(hand, starter):
+def score_hand(hand, starter, verbose=False):
     """
+    Score the hand.
 
-    :param hand:
-    :param starter:
+    :param hand: a four card hand
+    :param starter: the starter card
+    :param verbose: flag for printing
+    :return: the score of the hand
+
+
     """
-    points = 0
+    pts = 0
 
-#    print "Checking for 15s..."
-    points += score_15(hand, starter)
-#    print "  Points = %d" % points
+    p_15 = score_15(hand, starter)
+    pts += p_15
+    if verbose:
+        print "  15s:   {:>2}".format(p_15)
 
-#    print "Checking for pairs..."
-    points += score_pairs(hand, starter)
-#    print "  Points = %d" % points
+    p_pair = score_pairs(hand, starter)
+    pts += p_pair
+    if verbose:
+        print "  pairs: {:>2}".format(p_pair)
 
-#    print "Checking for runs..."
-    points += score_runs(hand, starter)
-#    print "  Points = %d" % points
+    p_run = score_runs(hand, starter)
+    pts += p_run
+    if verbose:
+        print "  runs:  {:>2}".format(p_run)
 
-#    print "Checking for flush..."
-    points += score_flush(hand, starter)
-#    print "  Points = %d" % points
+    p_flush = score_flush(hand, starter)
+    pts += p_flush
+    if verbose:
+        print "  flush: {:>2}".format(p_flush)
 
-#    print "Checking for right jack..."
-    points += score_nibs(hand, starter)
-#    print "  Points = %d" % points
+    p_nibs = score_nibs(hand, starter)
+    pts += p_nibs
+    if verbose:
+        print "  nibs:  {:>2}".format(p_nibs)
 
-    return points
+    return pts
+
 
 def score_15(hand, starter):
     """
@@ -118,18 +132,18 @@ def score_runs(hand, starter):
     :param starter: the starter card
     :return: the number of points from runs
 
-    5 in a row:
-    A 2 3 4 5
-    0 1 1 1 1
+    5 in a row: A 2 3 4 5   this is a run of 5
+                0 1 1 1 1
 
-    4 in a row: A 2 3 4 6
+    4 in a row: A 2 3 4 6   this has one run of 4
 
                 A 2 3 4    A 2 3 6    A 2 4 6   A 3 4 6   2 3 4 6
                 0 1 1 1    0 1 1 3    0 1 2 2   0 3 1 2   0 1 1 2
 
-    3 in a row:
-    6 5 3 2 A    6 5 4 2 A    7 5 4 3 A
-      1 2 1 1      1 1 2 1      2 1 1 2
+    3 in a row: A 2 3 3 6   this has two runs of 3
+
+                A 2 3   A 2 3   A 2 6   A 3 3   A 3 6   A 3 6   2 3 3   2 3 6   2 3 6   3 3 6
+                0 1 1   0 1 1   0 1 4   0 2 0   0 2 3   0 4 1   0 1 0   0 1 3   0 1 3   0 0 3
 
     >>> from card import Card
     >>> hand = [Card(Rank.jack, Suit.hearts), \
@@ -151,8 +165,8 @@ def score_runs(hand, starter):
     cards = hand[:]
     cards.append(starter)
 
+    # first check for a run of 5
     scards = sorted(cards)
-#    print scards
 
     ds = []
     c0 = scards[0]
@@ -162,9 +176,11 @@ def score_runs(hand, starter):
         c0 = c
 #        print c, c0, d
 
+    # if this matches, we have a run of 5 and can return
     if ds == [0, 1, 1, 1, 1]:
         return 5
 
+    # now check for runs of 4
     p = 0
     for cs in itertools.combinations(cards, 4):
         scards = sorted(cs)
@@ -178,11 +194,14 @@ def score_runs(hand, starter):
             c0 = c
 #            print c, c0, d
 
+        # if this matches, we have a run of 4
         if ds == [0, 1, 1, 1]:
             p += 4
+    # if p is no longer 0, we found runs of 4 and can return
     if p > 0:
         return p
 
+    # finally check for runs of 3
     p = 0
     for cs in itertools.combinations(cards, 3):
         scards = sorted(cs)
@@ -196,9 +215,11 @@ def score_runs(hand, starter):
             c0 = c
 #            print c, c0, d
 
+        # if this matches, we have a run of 3
         if ds == [0, 1, 1]:
             p += 3
 
+    # here we have runs of 3, or nothing
     return p
 
 
@@ -224,6 +245,7 @@ def score_flush(hand, starter):
     >>> starter = Card(Rank.five, Suit.clubs)
     >>> score_flush(hand, starter)
     4
+
     """
     cards = hand[:]
 
@@ -272,8 +294,9 @@ if __name__ == '__main__':
     doctest.testmod()
 
 #   Play around
+    verbose = False
     deck = Deck()
-    n_hands = 1000000
+    n_hands = 100000
 
     total = 0
     mx = -1
@@ -285,16 +308,16 @@ if __name__ == '__main__':
             hand.append(deck.deal.next())
         starter = deck.deal.next()
 
+        if verbose:
+            print "Hand {}: [{}] {} {} {} {}".format(h, starter, *hand)
 
-        pts = score_hand(hand, starter)
+        pts = score_hand(hand, starter, verbose)
+
+        if verbose:
+            print "  Total: {:>2}".format(pts)
+
         if pts > mx:
             mx = pts
-
-            print 'Hand', h, ':',
-            for c in hand:
-                print c,
-            print '[', starter, ']',
-            print ':', pts, 'points'
 
         total += pts
 

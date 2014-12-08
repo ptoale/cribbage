@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""
+A module that defines some classes that model playing cards.
+
+"""
 import math
 import random
 
@@ -19,13 +23,12 @@ class Suit(object):
         >>> s = Suit(Suit.clubs)
 
         """
-
         assert(suit in self.suits)
         self.suit = suit
 
     def __eq__(self, other):
         """
-        Provide a test of equivalence.
+        Provide a test of equality.
 
         :param other: an other Suit object
         :return: a boolean
@@ -37,8 +40,8 @@ class Suit(object):
         True
         >>> s1 == s3
         False
-        """
 
+        """
         return self.suit == other.suit
 
     def __str__(self):
@@ -49,8 +52,8 @@ class Suit(object):
 
         >>> str(Suit(Suit.diamonds))
         'D'
-        """
 
+        """
         if self.suit == 'Spades':
             return 'S'
         elif self.suit == 'Hearts':
@@ -68,8 +71,8 @@ class Suit(object):
 
         >>> unicode(Suit(Suit.diamonds))
         u'\u2666'
-        """
 
+        """
         if self.suit == 'Spades':
             return u'\u2660'
         elif self.suit == 'Hearts':
@@ -87,16 +90,18 @@ class Suit(object):
 
         >>> repr(Suit(Suit.diamonds))
         "Suit('Diamonds')"
-        """
 
+        """
         return "{}('{}')".format(self.__class__.__name__, self.suit)
 
 
 class Rank(object):
     """
+    A class representing the rank of a playing card
 
     """
-    ace, two, three, four, five, six, seven, eight, nine, ten, jack, queen, king = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+    ace, two, three, four, five, six, seven, eight, nine, ten, jack, queen, king = \
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
     ranks = [ace, two, three, four, five, six, seven, eight, nine, ten, jack, queen, king]
 
     def __init__(self, rank):
@@ -108,7 +113,6 @@ class Rank(object):
         >>> r = Rank(Rank.two)
 
         """
-
         assert(rank in self.ranks)
         self.rank = rank
 
@@ -126,8 +130,8 @@ class Rank(object):
         True
         >>> r1 == r3
         False
-        """
 
+        """
         return self.rank == other.rank
 
     def __lt__(self, other):
@@ -144,8 +148,8 @@ class Rank(object):
         False
         >>> r1 < r3
         True
-        """
 
+        """
         return self.rank < other.rank
 
     def __str__(self):
@@ -156,8 +160,8 @@ class Rank(object):
 
         >>> str(Rank(Rank.jack))
         'J'
-        """
 
+        """
         if self.rank == 1:
             return 'A'
         elif self.rank == 11:
@@ -177,8 +181,8 @@ class Rank(object):
 
         >>> unicode(Rank(Rank.jack))
         u'J'
-        """
 
+        """
         return unicode(str(self))
 
     def __repr__(self):
@@ -189,8 +193,8 @@ class Rank(object):
 
         >>> repr(Rank(Rank.jack))
         'Rank(11)'
-        """
 
+        """
         return "{}({})".format(self.__class__.__name__, self.rank)
 
 
@@ -226,6 +230,7 @@ class Card(object):
 
         >>> Card(Rank.jack, Suit.spades).get_suit()
         'Spades'
+
         """
         return self.suit.suit
 
@@ -257,6 +262,7 @@ class Card(object):
 
         >>> str(Card(Rank.jack, Suit.spades))
         'JS'
+
         """
         return str(self.rank) + str(self.suit)
 
@@ -266,6 +272,7 @@ class Card(object):
 
         >>> unicode(Card(Rank.jack, Suit.spades))
         u'J\u2660'
+
         """
         return unicode(self.rank) + unicode(self.suit)
 
@@ -275,13 +282,40 @@ class Card(object):
 
         >>> repr(Card(Rank.jack, Suit.spades))
         "Card(11, 'Spades')"
+
         """
         return "{}({}, '{}')".format(self.__class__.__name__, self.get_rank(), self.get_suit())
 
     def __eq__(self, other):
+        """
+        Test of equality of two cards.
+
+        :param other: another card object
+        :return: a boolean
+
+        >>> Card(Rank.king, Suit.spades) == Card(Rank.king, Suit.clubs)
+        False
+        >>> Card(Rank.king, Suit.spades) == Card(Rank.ace, Suit.spades)
+        False
+        >>> Card(Rank.king, Suit.spades) == Card(Rank.king, Suit.spades)
+        True
+
+        """
         return self.rank == other.rank and self.suit == other.suit
 
     def __lt__(self, other):
+        """
+        Define ordering of cards.
+
+        :param other: another card object
+        :return: a boolean
+
+        >>> Card(Rank.ace, Suit.spades) < Card(Rank.ace, Suit.clubs)
+        False
+        >>> Card(Rank.ace, Suit.spades) < Card(Rank.ten, Suit.clubs)
+        True
+
+        """
         return self.rank < other.rank
 
     def same_suit(self, other):
@@ -292,6 +326,7 @@ class Card(object):
         True
         >>> Card(Rank.jack, Suit.spades).same_suit(Card(Rank.jack, Suit.hearts))
         False
+
         """
         return self.suit == other.suit
 
@@ -303,6 +338,7 @@ class Card(object):
         False
         >>> Card(Rank.jack, Suit.spades).same_rank(Card(Rank.jack, Suit.hearts))
         True
+
         """
         return self.rank == other.rank
 
@@ -314,13 +350,26 @@ class Card(object):
         1
         >>> Card(Rank.jack, Suit.spades).del_rank(Card(Rank.jack, Suit.hearts))
         0
+
         """
         return int(math.fabs(self.get_rank() - other.get_rank()))
 
 
 class Deck(object):
+    """
+    A class representing a deck of playing cards.
+
+    """
 
     def __init__(self, rng=None):
+        """
+        Create a deck (and shuffle it).
+
+        :param rng: an optional random number generator
+
+        >>> deck = Deck()
+
+        """
         self.cards = []
 
         # Loop over suits
@@ -341,6 +390,7 @@ class Deck(object):
         >>> deck = Deck()
         >>> len(deck.get_cards())
         52
+
         """
         return self.cards
 
@@ -352,9 +402,11 @@ class Deck(object):
         >>> deck.shuffle()
         >>> len(deck.cards)
         52
+
         """
 
         self.rng.shuffle(self.cards)
+        # get a new iterator
         self.deal = self.cards.__iter__()
 
     def __iter__(self):
@@ -366,14 +418,10 @@ class Deck(object):
         >>> c = [i for i in deck]
         >>> len(c)
         52
+
         """
         return self.deal
     
 if __name__ == '__main__':
     import doctest
     doctest.testmod()    
-
-#    deck = Deck()
-#    deck.shuffle()
-#    for card in deck:
-#        print unicode(card)
